@@ -24,4 +24,6 @@ pip-log.txt
 *.mo
 
 #Mr Developer
-.mr.developer.cfg
+.mmiyaji.developer.cfg
+settings_local.py
+settings_deploy.py
