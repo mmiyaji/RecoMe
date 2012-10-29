@@ -12,6 +12,10 @@
     -webkit-text-overflow: ellipsis; /* Safari */
     -o-text-overflow: ellipsis; /* Opera */
 }
+.alert-ja {
+    /* for japanese */
+    padding: 14px 35px 8px 14px;
+}
 footer{
   padding-top: 10px;
   color: #777777;
@@ -34,3 +38,64 @@ table#author_table tbody tr:hover *{
     color:navy;
     text-decoration: underline;
 }
+/* .nav-tabs .dropdown-toggle:hover .caret, */
+/* .nav-pills .dropdown-toggle:hover .caret { */
+/*   border-top-color: #005580; */
+/*   border-bottom-color: #005580; */
+/* } */
+/* .nav-tabs .active .dropdown-toggle .caret, */
+/* .nav-pills .active .dropdown-toggle .caret { */
+/*   border-top-color: #333333; */
+/*   border-bottom-color: #333333; */
+/* } */
+
+/* .nav > .dropdown.active > a:hover { */
+/*   color: #000000; */
+/*   cursor: pointer; */
+/* } */
+
+/* .navbar { */
+/*   *position: relative; */
+/*   *z-index: 2; */
+/*   margin-bottom: 20px; */
+/*   overflow: visible; */
+/*   /\* color: #777777; *\/ */
+/* } */
+
+/* .navbar-inner { */
+/*   min-height: 40px; */
+/*   padding-right: 20px; */
+/*   padding-left: 20px; */
+/*   background-color: #2c2c2c; */
+/*   background-image: -moz-linear-gradient(top, #333333, #222222); */
+/*   background-image: -ms-linear-gradient(top, #333333, #222222); */
+/*   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222)); */
+/*   background-image: -webkit-linear-gradient(top, #333333, #222222); */
+/*   background-image: -o-linear-gradient(top, #333333, #222222); */
+/*   background-image: linear-gradient(top, #333333, #222222); */
+/*   background-repeat: repeat-x; */
+/*   -webkit-border-radius: 4px; */
+/*      -moz-border-radius: 4px; */
+/*           border-radius: 4px; */
+/*   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#333333', endColorstr='#222222', GradientType=0); */
+/*   -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1); */
+/*      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1); */
+/*           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1); */
+/* } */
+/* .navbar .brand { */
+/*   display: block; */
+/*   float: left; */
+/*   padding: 10px 20px 10px; */
+/*   margin-left: -20px; */
+/*   font-size: 20px; */
+/*   font-weight: 200; */
+/*   color: #ffffff; */
+/*   text-shadow: 0 1px 0 #aaaaaa; */
+/* } */
+/* .navbar .navbar-link { */
+/*   color: #999999; */
+/* } */
+
+/* .navbar .navbar-link:hover { */
+/*   color: #ffffff; */
+/* } */

@@ -12,9 +12,9 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li {% if not target %}class="active"{% else %}{%ifequal target "home"%}class="active"{%endifequal%}{% endif %}><a href="/">トップページ</a></li>
-              <li {%ifequal target "signup"%}class="active"{%endifequal%}><a href="/signup/">サインアップ</a></li>
               <li {%ifequal target "signup"%}class="active"{%endifequal%}><a href="/contents/">コンテンツリスト</a></li>
               <li {%ifequal target "help"%}class="active"{%endifequal%}><a href="/help/">ヘルプ</a></li>
+              <li {%ifequal target "signup"%}class="active"{%endifequal%}><a href="/signup/">サインアップ</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
