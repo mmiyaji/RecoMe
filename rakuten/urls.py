@@ -14,4 +14,5 @@ import os
 
 urlpatterns = patterns('',
                        url(r'^$', 'rakuten.general.home', name='home'),
+                       url(r'^content/$', 'rakuten.content.home'),
                        )

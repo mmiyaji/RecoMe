@@ -46,7 +46,8 @@
 
       $win.on('scroll', processScroll);
       $('.img_popover').popover({
-          placement:'bottom'
+          placement:'bottom',
+          trigger:'hover',
       });
 
     function processScroll() {

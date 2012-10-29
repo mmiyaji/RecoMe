@@ -1,9 +1,7 @@
 # Django settings for RecoMe project.
 import os, socket
-DEBUG = True
+DEBUG = False
 DEPLOY = True
-# DEBUG = False
-# DEPLOY = False
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ADMINS = (
