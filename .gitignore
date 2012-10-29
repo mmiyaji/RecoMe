@@ -1,4 +1,11 @@
 *.py[co]
+*.db
+*.svn*
+*.#*
+.DS_Store
+freeze/*
+*secretkey.txt
+.#*%
 
 # Packages
 *.egg
@@ -25,5 +32,9 @@ pip-log.txt
 
 #Mr Developer
 .mmiyaji.developer.cfg
+
 settings_local.py
 settings_deploy.py
+media/tmp/*
+media/archives/*
+!media/tmp/*.txt
