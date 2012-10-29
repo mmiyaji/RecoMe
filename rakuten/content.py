@@ -15,7 +15,7 @@ def home(request):
     """
     temp_values = Context()
     page=1
-    span = 8
+    span = 4
     order = "-created_at"
     content = {"url":"static/img/screenshot/miu.jpg", "caption":"hoge"}
     contents = [content for i in range(0,span)]
@@ -23,6 +23,7 @@ def home(request):
         "target":"content",
         "title":u"コンテンツ一覧ページ",
         "contents":contents,
+        "rakuten":True,
         }
     return render_to_response('content/index.html',temp_values,
                               context_instance=RequestContext(request))
