@@ -86,20 +86,22 @@
           {% if rakuten %}
 function showRSSfromJSON(json,count) {
     var html = '';
+    var imgurl = '';
     for( var i=0; i<count; i++ ) {
-        <!-- console.log(json.Items[i].Item); -->
+        console.log(json.Items[i].Item);
         try{
-            html += '<li class="span3"><div class="thumbnail img_popover" rel="popover" title="'+json.Items[i].Item.itemName +'" data-content=""><a href="'+json.Items[i].Item.itemName+'" class="thumbnail" target="_blank"><img src="'+json.Items[i].Item.mediumImageUrls[0].imageUrl+'" alt="view in new tab"></a><div class="caption"><h3></h3><hr /><p>'+json.Items[i].Item.itemName+'</p></div></div></li>';
+            imgurl = json.Items[i].Item.mediumImageUrls[0].imageUrl.split('?')[0];
         }catch(error){
-            // console.log(error);
+            imgurl = json.Items[i].Item.mediumImageUrls[0].imageUrl;
         }
+        html += '<li class="span3"><div class="thumbnail img_popover" rel="popover" title="'+json.Items[i].Item.itemName +'" data-content=""><a href="'+json.Items[i].Item.itemName+'" class="thumbnail" target="_blank"><img src="'+imgurl+'" alt="view in new tab"></a><div class="caption"><h3></h3><hr /><p>'+json.Items[i].Item.itemName+'</p></div></div></li>';
     }
     html = html.replace(/\r\n/g, "<br />");
-    $('#content_thumb').append( $(html) );
     return html;
 }
 function inserRakuten(json) {
     var html = showRSSfromJSON(json,30);
+    $('#content_thumb').append( $(html) );
 }
 // rakuten AP
 var s=document.createElement('script');
@@ -107,13 +109,13 @@ s.charset='UTF-8';
 s.src='https://app.rakuten.co.jp/services/api/IchibaItem/Ranking/20120927?applicationId=1057087014194595280&genreId=101266&callback=inserRakuten';
 document.body.appendChild(s);
 // end rakuten
-          {% endif %}
           $(window).load(function(){
           var $container = $('.thumbnails');
           $container.masonry({
           itemSelector : '.span3'
           });
           });
+          {% endif %}
         -->
     </script>
   </body>
