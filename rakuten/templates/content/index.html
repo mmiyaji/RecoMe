@@ -12,21 +12,22 @@
     {% for photo in contents %}
     <li class="span3">
       <div class="thumbnail img_popover" rel="popover" title="{{photo.title}}" data-content="<h4>作成者</h4><ul>{% if photo.get_authors %}{% for author in photo.get_authors %}<li>学生ID: {{author.student_id}}, 氏名: {{author.name}}</li>{% endfor %}{% else %}<li>未登録</li>{% endif %}</ul><hr><h4>作成日</h4><ul><li>{{photo.published_at}}</li></ul>">
-        <a href="/{{ photo.url }}" class="thumbnail" target="_blank">
-          <img src="/{{ photo.url }}" alt="view in new tab '{{photo.title}}'" width="100%">
+        <a href="http://item.rakuten.co.jp/{{ photo.shop_code }}/{{ photo.url }}" class="thumbnail" target="_blank">
+          <img src="http://thumbnail.image.rakuten.co.jp/{{ photo.image_url }}" alt="view in new tab '{{photo.title}}'" width="100%">
         </a>
-        {% ifnotequal photo.caption "" %}
+        {% ifnotequal photo.name "" %}
         <div class="caption">
-          <h3>{{ photo.caption }}</h3>
-          {% if photo.comment %}
+          <h4>{{ photo.name }}</h4>
+          {% if photo.description %}
           <hr />
-          <p>{{ photo.comment }}</p>
+          <p>{{ photo.description }}</p>
+          <small>{{ photo.review_average }}</small>
           {% endif %}
         </div>
         {% else %}
-        {% ifnotequal photo.comment "" %}
+        {% ifnotequal photo.description "" %}
         <div class="caption">
-          <p>{{ photo.comment }}</p>
+          <p>{{ photo.name }}</p>
         </div>
         {% endifnotequal %}
         {% endifnotequal %}
@@ -35,16 +36,24 @@
     {% endfor %}
   </ul>
   <hr class="soften">
-  <div class="btn-toolbar">
-    <button class="btn btn-large" type="button">
-      <i class="icon-arrow-left"></i>
-      Prev
-    </button>
-    <button class="btn btn-large btn-primary" type="button">
-      Next
-      <i class="icon-arrow-right icon-white"></i>
-    </button>
-  </div>
+  <!-- <div class="btn-toolbar"> -->
+  <!--   <button class="btn btn-large" type="button"> -->
+  <!--     <i class="icon-arrow-left"></i> -->
+  <!--     Prev -->
+  <!--   </button> -->
+  <!--   <button class="btn btn-large btn-primary" type="button"> -->
+  <!--     Next -->
+  <!--     <i class="icon-arrow-right icon-white"></i> -->
+  <!--   </button> -->
+  <!-- </div> -->
+  <ul class="pager">
+    <li class="previous">
+      <a href="#">&larr; Prev</a>
+    </li>
+    <li class="next">
+      <a href="#">Next &rarr;</a>
+    </li>
+  </ul>
 </section>
 {% include "component/image_modal.html" %}
 {% endblock main %}

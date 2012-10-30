@@ -12,6 +12,9 @@ MANAGERS = SQLADMIN_PASS
 DBPATH = os.path.join(BASE_DIR, 'mains.db')
 EXPORT_PATH = "archives/download/"
 EXPORT_URL = "/media/"+EXPORT_PATH
+MONGODB_USE = False
+MONGODB_PATH = "127.0.0.1"
+MONGODB_PORT = 10000
 try:
     from settings_local import *
 except:

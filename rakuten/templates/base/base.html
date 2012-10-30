@@ -94,7 +94,7 @@ function showRSSfromJSON(json,count) {
         }catch(error){
             imgurl = json.Items[i].Item.mediumImageUrls[0].imageUrl;
         }
-        html += '<li class="span3"><div class="thumbnail img_popover" rel="popover" title="'+json.Items[i].Item.itemName +'" data-content=""><a href="'+json.Items[i].Item.itemName+'" class="thumbnail" target="_blank"><img src="'+imgurl+'" alt="view in new tab"></a><div class="caption"><h3></h3><hr /><p>'+json.Items[i].Item.itemName+'</p></div></div></li>';
+        html += '<li class="span3"><div class="thumbnail img_popover" rel="popover" title="'+json.Items[i].Item.itemName +'" data-content=""><a href="'+json.Items[i].Item.itemName+'" class="thumbnail" target="_blank"><img src="'+imgurl+'" alt="view in new tab"></a><div class="caption"><h4>'+json.Items[i].Item.itemName.slice(0, 10)+'</h4><hr /><p>'+json.Items[i].Item.itemCaption.slice(0, 20)+'</p></div></div></li>';
     }
     html = html.replace(/\r\n/g, "<br />");
     return html;
