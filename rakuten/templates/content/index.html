@@ -2,35 +2,34 @@
 {% block main %}
 <!-- Masthead
      ================================================== -->
-<header class="jumbotron subhead" id="overview">
+<!-- <header class="jumbotron subhead" id="overview"> -->
   <!-- <h2 id="title">登録済みファイル</h2> -->
 <!-- Photo view
      ================================================== -->
-<section>
+<div>
   <!-- <h1>プレビュー</h1> -->
+  {% if genre_name %}<h2>{{genre_name}}<small>{{count}} / {{session.session_key}} {{session.date}}</small></h2>{% endif %}
   <ul id="content_thumb" class="thumbnails" data-toggle="modal-gallery" data-target="#modal-gallery">
     {% for photo in contents %}
     <li class="span3">
-      <div class="thumbnail img_popover" rel="popover" title="{{photo.title}}" data-content="<h4>作成者</h4><ul>{% if photo.get_authors %}{% for author in photo.get_authors %}<li>学生ID: {{author.student_id}}, 氏名: {{author.name}}</li>{% endfor %}{% else %}<li>未登録</li>{% endif %}</ul><hr><h4>作成日</h4><ul><li>{{photo.published_at}}</li></ul>">
+      <div class="thumbnail img_popover" rel="popover" title="{{photo.name}}" data-content="<h5>商品説明</h5><ul><li>{{photo.description}}</li></ul>">
         <a href="http://item.rakuten.co.jp/{{ photo.shop_code }}/{{ photo.url }}" class="thumbnail" target="_blank">
           <img src="http://thumbnail.image.rakuten.co.jp/{{ photo.image_url }}" alt="view in new tab '{{photo.title}}'" width="100%">
         </a>
         {% ifnotequal photo.name "" %}
         <div class="caption">
           <h4>{{ photo.name }}</h4>
-          {% if photo.description %}
-          <hr />
-          <p>{{ photo.description }}</p>
-          <small>{{ photo.review_average }}</small>
-          {% endif %}
-        </div>
-        {% else %}
-        {% ifnotequal photo.description "" %}
-        <div class="caption">
-          <p>{{ photo.name }}</p>
+          <!-- {% if photo.description %} -->
+          <!-- <hr /> -->
+          <!-- <p>{{ photo.description }} <small>{{ photo.ext_description }}</small></p> -->
+          <!-- <small>{{ photo.review_average }} [{{ photo.review_count }}]</small> -->
+          <!-- {% endif %} -->
         </div>
         {% endifnotequal %}
-        {% endifnotequal %}
+        <!-- <small> -->
+        <!-- {% for t in photo.tfidfs %} -->
+        <!-- {{t}},{% endfor %} -->
+        <!-- </small> -->
       </div>
     </li>
     {% endfor %}
@@ -54,6 +53,6 @@
       <a href="#">Next &rarr;</a>
     </li>
   </ul>
-</section>
+</div>
 {% include "component/image_modal.html" %}
 {% endblock main %}
