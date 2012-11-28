@@ -48,8 +48,7 @@ class Recom():
             return length,path
     def recalc_network(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000):
         G=nx.Graph()
-        MONGODB_PATH = "127.0.0.1"
-        conn = pymongo.Connection(MONGODB_PATH, 10001)
+        conn = pymongo.Connection(settings.MONGODB_PATH2, settings.MONGODB_PORT2)
         db = conn.rakuten
         usedb = eval("db.%s" % memkey)
         nets = usedb.find()
