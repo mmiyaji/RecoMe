@@ -15,6 +15,9 @@ EXPORT_URL = "/media/"+EXPORT_PATH
 MONGODB_USE = False
 MONGODB_PATH = "127.0.0.1"
 MONGODB_PORT = 10000
+MEMCACHED_USE = False
+MEMCACHED_PATH = "127.0.0.1"
+MEMCACHED_PORT = 11111
 try:
     from settings_local import *
 except:
@@ -152,6 +155,10 @@ MIDDLEWARE_CLASSES = (
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     )
+if MEMCACHED_USE:
+    CACHE_BACKEND = 'memcached://%s:%d' % (MEMCACHED_PATH, MEMCACHED_PORT)
+else:
+    CACHE_BACKEND = 'dummy:///'
 
 ROOT_URLCONF = 'RecoMe.urls'
 

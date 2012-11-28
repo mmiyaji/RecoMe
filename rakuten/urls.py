@@ -15,6 +15,10 @@ import os
 urlpatterns = patterns('',
                        url(r'^$', 'rakuten.general.home', name='home'),
                        url(r'^content/$', 'rakuten.content.home'),
+                       url(r'^content/(?P<genre_id>\w+)/$', 'rakuten.content.home'),
+                       url(r'^genre/$', 'rakuten.content.genre'),
+                       url(r'^genre/(?P<genre_id>\w+)/$', 'rakuten.content.genre'),
+                       url(r'^recommend/$', 'rakuten.content.home', {'name':'recommend'}),
                        url(r'^login/$', 'rakuten.general.signin'),
                        url(r'^logout/$', 'rakuten.general.signout'),
                        )

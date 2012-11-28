@@ -6,7 +6,7 @@
 freeze/*
 *secretkey.txt
 .#*%
-
+*.dump
 # Packages
 *.egg
 *.egg-info

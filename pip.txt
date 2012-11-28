@@ -1,0 +1,6 @@
+Django==1.4.2
+ipython==0.13.1
+networkx==1.7
+pymongo==2.3
+pysqlite==2.6.3
+simplejson==2.6.2
