@@ -41,9 +41,7 @@ def home(request, genre_id = None, name = 'content'):
     if settings.MONGODB_USE:
         start = 0
         genre_name = ""
-        MONGODB_PATH = "127.0.0.1"
-        # MONGODB_PATH = settings.MONGODB_PATH
-        conn = pymongo.Connection(MONGODB_PATH, settings.MONGODB_PORT)
+        conn = pymongo.Connection(settings.MONGODB_PATH, settings.MONGODB_PORT)
         db = conn.rakuten
         usedb = db.booktree
         if request.GET.has_key('page'):
