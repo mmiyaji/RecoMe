@@ -4,6 +4,7 @@ DEBUG = False
 DEPLOY = True
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TMP_DIR = os.path.dirname(os.path.abspath(__file__))
 ADMINS = (
     ('mmiyaji', 'ruhenheim1223@gmail.com'),
     )

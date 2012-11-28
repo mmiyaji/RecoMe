@@ -21,7 +21,7 @@ class Recom():
                 self.G=pickle.load(open(os.path.join(settings.BASE_DIR,'nx.dump')))
             except:
                 g,self.G = self.recalc_network(memkey)
-                pickle.dump(self.G,open(os.path.join(settings.BASE_DIR,'nx.dump'),'w'))
+                pickle.dump(self.G,open(os.path.join(settings.TMP_DIR,'nx.dump'),'w'))
         for c,i in enumerate(self.G.nodes()):
             self.get_path(i)
             print c,i
