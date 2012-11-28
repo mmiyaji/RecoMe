@@ -5,14 +5,15 @@ content.py
 
 Ccreated by mmiyaji on 2012-10-29.
 Copyright (c) 2012  ruhenheim.org. All rights reserved.
-/"""
+"""
 from views import *
 from recommend import *
-import re
+import re, random
 from django.contrib.sessions.backends.db import SessionStore
+from rakuten.models import *
 if settings.MONGODB_USE:
     import pymongo
-def home(request, genre_id = None, name = 'content'):
+def home(request, genre_id = None, content_id = None, name = 'content'):
     """
     Case of GET REQUEST '/content/'
     画像の一覧を表示するページ
@@ -20,6 +21,7 @@ def home(request, genre_id = None, name = 'content'):
     temp_values = Context()
     page=1
     span = 8
+    pspan = 3
     order = "-created_at"
     conten = {}
     genre = '101266'
@@ -29,6 +31,7 @@ def home(request, genre_id = None, name = 'content'):
     recommend = False
     if name == "recommend":
         recommend = True
+        print content_id
     # セッションに初回アクセスを保存
     session = request.session
     if 'date' not in session:
@@ -56,6 +59,51 @@ def home(request, genre_id = None, name = 'content'):
             if name == "recommend":
                 recommend = True
                 recom = Recom()
+                user = None
+                c = get_by_id_from_mongo(content_id)
+                if c and request.user.is_authenticated():
+                    tfidfs = c['tfidfs']
+                    user = request.user
+                    history = History()
+                    history.user = user
+                    history.content_id = content_id
+                    history.save()
+
+                    inds = Individual.get_by_user(user)
+                    t = sorted(tfidfs.items(), key=lambda x: x[1]["tfidf"], reverse=True)
+                    # print t
+                    ids = []
+                    for i in range(0,span):
+                        try:
+                            ind = inds[i]
+                        except:
+                            ind = Individual()
+                            ind.user = user
+                        ind.recent_history = history
+                        ind.save()
+                        for p in range(0,pspan):
+                            paras = ind.parameter.all()
+                            ts = t[p]
+                            w = ts[0]
+                            try:
+                                para = paras[p]
+                                length,path = recom.get_path(para.word, w)
+                                print length, path
+                                # rl = rouletteChoice(path)
+                                rl = random.choice(path)
+                                print rl
+                                para.word = rl
+                            except:
+                                para = Parameter()
+                                para.rank = p
+                                para.word = w
+                                para.score = ts[1]["tfidf"]
+                            para.save()
+                            ind.parameter.add(para)
+                        ind.save()
+                        ids.append(ind)
+            else:
+                pass
             netdb = usedb.find({'genre_tree':genre,
                               # 'isimage':{'$exists':True},
                               # 'image_code':200,
@@ -158,7 +206,29 @@ def genre(request, genre_id = None):
         }
     return render_to_response('content/genre.html',temp_values,
                               context_instance=RequestContext(request))
-
+def get_by_id_from_mongo(id):
+    conn = pymongo.Connection(settings.MONGODB_PATH, settings.MONGODB_PORT)
+    db = conn.rakuten
+    usedb = db.booktree
+    return usedb.find_one({'id':id})
+def rouletteChoice(itemList, getWeight = None, getItem = None):
+    if getWeight == None:
+        def _getWeight(item):
+            return item
+        getWeight = _getWeight
+    totalWeight = 0
+    for item in itemList:
+        totalWeight += getWeight(item)
+    r = random.random() * totalWeight
+    for i in xrange(len(itemList)):
+        w = getWeight(itemList[i])
+        if r < w:
+            if getItem:
+                return getItem(itemList[i])
+            else:
+                return i
+        else:
+            r -= w
 def main():
     pass
 

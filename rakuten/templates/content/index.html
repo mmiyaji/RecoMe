@@ -13,7 +13,7 @@
     {% for photo in contents %}
     <li class="span3">
       <div class="thumbnail img_popover" rel="popover" title="{{photo.name}}" data-content="<h5>商品説明</h5><ul><li>{{photo.description}}</li></ul>">
-        <a href="http://item.rakuten.co.jp/{{ photo.shop_code }}/{{ photo.url }}" class="thumbnail" target="_blank">
+        <a href="/recommend/{{ photo.id }}/" class="thumbnail">
           <img src="http://thumbnail.image.rakuten.co.jp/{{ photo.image_url }}" alt="view in new tab '{{photo.title}}'" width="100%">
         </a>
         {% ifnotequal photo.name "" %}

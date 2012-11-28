@@ -38,11 +38,11 @@ class Recom():
             return cache.get(p)
         else:
             length,path=nx.single_source_dijkstra(self.G, w1)
-            print cache.set(p, [length,path], 300000)
-            if p in cache:
-                print 'found',p
-            else:
-                print 'not found',p
+            cache.set(p, [length,path], 300000)
+            # if p in cache:
+            #     print 'found',p
+            # else:
+            #     print 'not found',p
         if w2:
             return length[w2],path[w2]
         else:
