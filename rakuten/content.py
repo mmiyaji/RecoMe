@@ -132,7 +132,8 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                         ind.save()
                         ids.append(ind)
                         np = norm(ppp)
-                        print np, ppp
+                        if settings.DEBUG:
+                            print np, ppp
                         for pp1,p2 in zip(ind.parameter.all(),np):
                             pp1.score = p2
                             pp1.save()
@@ -146,10 +147,11 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                     # for ip in iipara:
                     #     iiw.append(ip.word)
                     for il in range(0,len(iipara)-1):
-                        print 'search by ',
-                        for q in iiw:
-                            print q,
-                        print
+                        if settings.DEBUG:
+                            print 'search by ',
+                            for q in iiw:
+                                print q,
+                            print
                         iiii = '_'.join(iiw)
                         iikey = genre+"_"+iiii
                         if iikey in cache:
@@ -161,7 +163,8 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                                              })
                             try:
                                 cache.set(iikey, c2, 0)
-                                print 'set',iikey
+                                if settings.DEBUG:
+                                    print 'set',iikey
                             except:
                                 pass
                         print '## ', c2.count(),iiw
@@ -180,10 +183,6 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                         if is_find:
                             break
                         iiw.append(iipara[il+1].word)
-                    try:
-                        print c.name
-                    except:
-                        print ind_count
                     contents.append(c)
                 count = 0
                 genre_name = db.ichiba_genre.find({'id':genre})[0]["name"]
