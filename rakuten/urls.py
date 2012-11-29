@@ -16,9 +16,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
                        url(r'^$', 'rakuten.general.home', name='home'),
-                       url(r'^content/', 'rakuten.content.home'),
-                       url(r'^content/(?P<genre_id>\w+)/', 'rakuten.content.home'),
-                       url(r'^genre/', 'rakuten.content.genre'),
+                       url(r'^content/$', 'rakuten.content.home'),
+                       url(r'^content/(?P<content_id>[\w:\-\_]+)/', 'rakuten.content.home'),
+                       url(r'^genre/$', 'rakuten.content.genre'),
                        url(r'^genre/(?P<genre_id>\w+)/', 'rakuten.content.genre'),
                        url(r'^recommend/$', 'rakuten.content.home', {'name':'recommend'}),
                        url(r'^recommend/(?P<content_id>[\w:\-\_]+)/', 'rakuten.content.home', {'name':'recommend'}),
