@@ -74,7 +74,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                     # print t
                     ids = []
                     for i in range(0,span):
-                        print i
+                        print "######",i
                         try:
                             ind = inds[i]
                         except:
@@ -86,15 +86,20 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                             paras = ind.parameter.all()
                             ts = t[p]
                             w = ts[0]
-                            try:
+                            print len(paras),p
+                            if len(paras) > p:
                                 para = paras[p]
-                                length,path = recom.get_path(para.word, w)
+                                length = 0
+                                try:
+                                    length,path = recom.get_path(para.word, w)
+                                except:
+                                    path = [para.word, w]
                                 print length, len(path)
                                 # rl = rouletteChoice(path)
                                 rl = random.choice(path)
                                 print rl
                                 para.word = rl
-                            except:
+                            else:
                                 para = Parameter()
                                 para.rank = p
                                 para.word = w
@@ -103,20 +108,30 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                             ind.parameter.add(para)
                         ind.save()
                         ids.append(ind)
+                netdb = usedb.find({'genre_tree':genre,
+                                    # 'isimage':{'$exists':True},
+                                    # 'image_code':200,
+                                    'im':True,
+                                    # 'words':{'$ne':'中古'},
+                                    }).sort('review_count', pymongo.DESCENDING)
+                net = netdb.skip(start).limit(limit)
+                count = netdb.count()
+                genre_name = db.ichiba_genre.find({'id':genre})[0]["name"]
+                contents = net
             else:
-                pass
-            netdb = usedb.find({'genre_tree':genre,
-                              # 'isimage':{'$exists':True},
-                              # 'image_code':200,
-                              'im':True,
-                              # 'words':{'$ne':'中古'},
-                              }).sort('review_count', pymongo.DESCENDING)
-            net = netdb.skip(start).limit(limit)
-            count = netdb.count()
-            genre_name = db.ichiba_genre.find({'id':genre})[0]["name"]
+                netdb = usedb.find({'genre_tree':genre,
+                                    # 'isimage':{'$exists':True},
+                                    # 'image_code':200,
+                                    'im':True,
+                                    # 'words':{'$ne':'中古'},
+                                    }).sort('review_count', pymongo.DESCENDING)
+                net = netdb.skip(start).limit(limit)
+                count = netdb.count()
+                genre_name = db.ichiba_genre.find({'id':genre})[0]["name"]
+                contents = net
         else:
             net = usedb.find().sort('review_count', pymongo.ASCENDING).sort('review_average', pymongo.DESCENDING).skip(start).limit(limit)
-        contents = net
+            contents = net
     else:
         content = {
             "image_url":"/static/img/screenshot/miu.jpg",
