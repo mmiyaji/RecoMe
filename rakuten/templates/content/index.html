@@ -8,7 +8,9 @@
      ================================================== -->
 <div>
   <!-- <h1>プレビュー</h1> -->
-  {% if genre_name %}<h2>{{genre_name}}<small>{{count}} / {{session.session_key}} {{session.date}}</small></h2>{% endif %}
+  {% if genre_name %}<h2>{{genre_name}}
+    <!-- <small>{{count}} / {{session.session_key}} {{session.date}}</small> -->
+  </h2>{% endif %}
   <ul id="content_thumb" class="thumbnails" data-toggle="modal-gallery" data-target="#modal-gallery">
     {% for photo in contents %}
     <li class="span3">

@@ -161,7 +161,8 @@ MIDDLEWARE_CLASSES = (
 if MEMCACHED_USE:
     CACHE_BACKEND = 'memcached://%s:%d' % (MEMCACHED_PATH, MEMCACHED_PORT)
 else:
-    CACHE_BACKEND = 'dummy:///'
+    CACHE_BACKEND = 'locmem:///'
+    # CACHE_BACKEND = 'dummy:///'
 
 ROOT_URLCONF = 'RecoMe.urls'
 

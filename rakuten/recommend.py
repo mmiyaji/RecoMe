@@ -34,15 +34,10 @@ class Recom():
     def get_path(self, w1, w2 = ""):
         p = "netpath_%s" % w1
         if p in cache:
-            print 'f',p
             return cache.get(p)
         else:
             length,path=nx.single_source_dijkstra(self.G, w1)
             cache.set(p, [length,path], 300000)
-            # if p in cache:
-            #     print 'found',p
-            # else:
-            #     print 'not found',p
         if w2:
             return length[w2],path[w2]
         else:

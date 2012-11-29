@@ -11,6 +11,8 @@ from recommend import *
 import re, random
 from django.contrib.sessions.backends.db import SessionStore
 from rakuten.models import *
+import simplejson
+from django.core import serializers
 if settings.MONGODB_USE:
     import pymongo
 def home(request, genre_id = None, content_id = None, name = 'content'):
@@ -21,7 +23,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
     temp_values = Context()
     page=1
     span = 8
-    pspan = 3
+    pspan = 10
     order = "-created_at"
     conten = {}
     genre = '101266'
@@ -56,7 +58,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
         # net = usedb.find(u'genre_tree',u'101266').sort('review_average', pymongo.DESCENDING).skip(start).limit(limit) .sort('review_average', pymongo.DESCENDING)
         if genre:
 #            net = usedb.find({'rc':{'$exists':True} ,'genre_tree':genre, 'isimage':{'$ne':False}}).sort('rc', pymongo.DESCENDING).skip(start).limit(limit)
-            if name == "recommend":
+            if name == "recommend" and content_id:
                 recommend = True
                 recom = Recom()
                 user = None
@@ -71,7 +73,6 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
 
                     inds = Individual.get_by_user(user)
                     t = sorted(tfidfs.items(), key=lambda x: x[1]["tfidf"], reverse=True)
-                    # print t
                     ids = []
                     for i in range(0,span):
                         print "######",i
@@ -82,42 +83,111 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                             ind.user = user
                         ind.recent_history = history
                         ind.save()
+                        ppp = []
                         for p in range(0,pspan):
                             paras = ind.parameter.all()
-                            ts = t[p]
-                            w = ts[0]
-                            print len(paras),p
                             if len(paras) > p:
+                                if len(t) > p:
+                                    ts = t[p]
+                                    w = ts[0]
+                                else:
+                                    continue
                                 para = paras[p]
                                 length = 0
                                 try:
-                                    length,path = recom.get_path(para.word, w)
+                                    lengthj,pathj = recom.get_path(para.word)
+                                    path = pathj[w]
+                                    length = lengthj[w]
                                 except:
                                     path = [para.word, w]
-                                # print length, len(path)
-                                # rl = rouletteChoice(path)
-                                rl = random.choice(path)
-                                # print rl
-                                para.word = rl
+                                hop = len(path)
+                                sp = ts[1]["tfidf"]
+                                ep = para.score
+                                path_value = [sp]
+                                if hop == 1:
+                                    path.append(path[0])
+                                    path.append(path[0])
+                                    hop = len(path)
+                                if hop > 2:
+                                    step = (ep - sp) / (hop - 1)
+                                    for pp in range(1,hop-1):
+                                        path_value.append(sp+(pp*step))
+                                path_value.append(ep)
+                                rl = rouletteChoice(path_value)
+                                if settings.DEBUG:
+                                    print "path",path, path_value
+                                    for w1,w2 in zip(path, path_value):
+                                        print w1,w2,",",
+                                    print rl
+                                para.word = path[rl]
+                                para.score = path_value[rl]
                             else:
                                 para = Parameter()
                                 para.rank = p
                                 para.word = w
                                 para.score = ts[1]["tfidf"]
+                            ppp.append(para.score)
                             para.save()
                             ind.parameter.add(para)
                         ind.save()
                         ids.append(ind)
-                netdb = usedb.find({'genre_tree':genre,
-                                    # 'isimage':{'$exists':True},
-                                    # 'image_code':200,
-                                    'im':True,
-                                    # 'words':{'$ne':'中古'},
-                                    }).sort('review_count', pymongo.DESCENDING)
-                net = netdb.skip(start).limit(limit)
-                count = netdb.count()
+                        np = norm(ppp)
+                        print np, ppp
+                        for pp1,p2 in zip(ind.parameter.all(),np):
+                            pp1.score = p2
+                            pp1.save()
+                contents = []
+                for ii in ids:
+                    ind_count = 0
+                    c = None
+                    is_find = False
+                    iipara = ii.parameter.all()
+                    iiw = [iipara[0].word]
+                    # for ip in iipara:
+                    #     iiw.append(ip.word)
+                    for il in range(0,len(iipara)-1):
+                        print 'search by ',
+                        for q in iiw:
+                            print q,
+                        print
+                        iiii = '_'.join(iiw)
+                        iikey = genre+"_"+iiii
+                        if iikey in cache:
+                            c2 = cache.get(iikey)
+                        else:
+                            c2 = usedb.find({'genre_tree':genre,
+                                             'im':True,
+                                             'words': {'$in':iiw},
+                                             })
+                            try:
+                                cache.set(iikey, c2, 0)
+                                print 'set',iikey
+                            except:
+                                pass
+                        print '## ', c2.count(),iiw
+                        if c2.count() > 0:
+                        #     print 'dame',iiw
+                        # else:
+                            print iiw
+                            for c in c2:
+                                if c not in contents:
+                                    is_find = True
+                                    break
+                                # ind_count += 1
+                                # if ind_count > span * 3:
+                                #     print 'not found...'
+                                #     break
+                        if is_find:
+                            break
+                        iiw.append(iipara[il+1].word)
+                    try:
+                        print c.name
+                    except:
+                        print ind_count
+                    contents.append(c)
+                count = 0
                 genre_name = db.ichiba_genre.find({'id':genre})[0]["name"]
-                contents = net
+                # echoes(request, ids, contents)
             else:
                 netdb = usedb.find({'genre_tree':genre,
                                     # 'isimage':{'$exists':True},
@@ -245,8 +315,32 @@ def rouletteChoice(itemList, getWeight = None, getItem = None):
                 return i
         else:
             r -= w
+def norm(array):
+    a = numpy.array([array])
+    n = a / numpy.linalg.norm(a)
+    return list(n[0])
 def main():
     pass
+# 指定したディレクトリにログ書きだし
+def echoes(request, inds, contents):
+    if True:
+        user = request.user
+        nowdate = datetime.datetime.now()
+        now = nowdate.strftime("%a, %d %b %Y %H:%M:%S +0900")
+        dir_date = nowdate.strftime("%Y")
+        commands.getoutput("mkdir -p "+settings.TMP_DIR+'/'+user.username+'/access/'+dir_date)
+        dirs = settings.TMP_DIR+'/'+user.username+'/access/'+dir_date+'/'+nowdate.strftime("%m")+'.json'
+        f=open(dirs,'a')
+        tmp = {
+            "date":now,
+            "user":user.username,
+            "individuals":inds,
+            "contents":contents,
+            }
+        f.write(serializers.serialize('json', tmp))
+        f.close()
+    # except:
+    #     pass
 
 if __name__ == '__main__':
     main()

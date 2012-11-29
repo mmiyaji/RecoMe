@@ -23,6 +23,7 @@ from django.conf import settings
 from django.http import Http404
 from django.core.cache import cache
 import networkx as nx
+import numpy
 logger = logging.getLogger('app')
 
 def main():
