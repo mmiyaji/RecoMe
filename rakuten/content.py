@@ -94,10 +94,10 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                                     length,path = recom.get_path(para.word, w)
                                 except:
                                     path = [para.word, w]
-                                print length, len(path)
+                                # print length, len(path)
                                 # rl = rouletteChoice(path)
                                 rl = random.choice(path)
-                                print rl
+                                # print rl
                                 para.word = rl
                             else:
                                 para = Parameter()
