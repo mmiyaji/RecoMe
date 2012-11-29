@@ -254,12 +254,12 @@ def get_individuals(request, user, content_id, span, pspan, recom):
             ppp = []
             for p in range(0,pspan):
                 paras = ind.parameter.all()
+                if len(t) > p:
+                    ts = t[p]
+                    w = ts[0]
+                else:
+                    continue
                 if len(paras) > p:
-                    if len(t) > p:
-                        ts = t[p]
-                        w = ts[0]
-                    else:
-                        continue
                     para = paras[p]
                     length = 0
                     try:
