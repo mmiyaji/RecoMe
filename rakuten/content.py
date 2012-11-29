@@ -74,6 +74,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                     # print t
                     ids = []
                     for i in range(0,span):
+                        print i
                         try:
                             ind = inds[i]
                         except:
@@ -88,7 +89,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                             try:
                                 para = paras[p]
                                 length,path = recom.get_path(para.word, w)
-                                print length, path
+                                print length, len(path)
                                 # rl = rouletteChoice(path)
                                 rl = random.choice(path)
                                 print rl
