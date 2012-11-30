@@ -9,6 +9,8 @@ Copyright (c) 2012  ruhenheim.org. All rights reserved.
 from views import *
 import pymongo
 import pickle
+import pygraphviz as pgv
+
 class Recom():
     """
     """
@@ -63,6 +65,31 @@ class Recom():
             G.add_edge(i['word01'],i['word02'], weight=wei)
         cache.set(memkey, G, memtime)
         return cache.get(memkey),G
+    def draw(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000):
+        A = pgv.AGraph()
+        conn = pymongo.Connection(settings.MONGODB_PATH2, settings.MONGODB_PORT2)
+        db = conn.rakuten
+        usedb = eval("db.%s" % memkey)
+        nets = usedb.find()
+        count = nets.count()
+        out = (os.path.join(settings.TMP_DIR,'pyg.png'))
+        max = 0
+        min = 999999
+        for c,i in enumerate(nets):
+            if c % 1000 == 0:
+                print c+1,"/",count, i
+            cc = float(i['count'])
+            A.add_node(i['word01'])
+            A.add_node(i['word02'])
+            wei = 1.0-cc/edge_max
+            if wei < 0:
+                wei = 0
+            A.add_edge(i['word01'],i['word02'], weight=wei)
+        A.layout(prog='dot')
+        A.draw(out)
+        # P = pgv.AGraph(d)
+        # P.layout(prog='dot')
+        # P.draw('pyg_ja.png')
 
 def main():
     r = Recom()

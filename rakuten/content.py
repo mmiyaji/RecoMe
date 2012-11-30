@@ -75,7 +75,6 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                         tfidfs = c['tfidfs']
                         t = sorted(tfidfs.items(), key=lambda x: x[1]["tfidf"], reverse=True)
                         for i in range(0,span):
-                            print "######",i
                             ppp = []
                             for p in range(0,pspan):
                                 if len(t) > p:
