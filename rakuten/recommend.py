@@ -65,19 +65,27 @@ class Recom():
             G.add_edge(i['word01'],i['word02'], weight=wei)
         cache.set(memkey, G, memtime)
         return cache.get(memkey),G
-    def draw(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000):
-        A = pgv.AGraph()
+    def draw(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000, viewport='3000,2000,.1', out='pyg.png', prog='neato', maxnode=2000):
+        dot = """
+        graph pyg
+        {
+          graph [viewport="%s", resolution=72];
+           }
+            """ % viewport
+        A = pgv.AGraph(string=dot)
         conn = pymongo.Connection(settings.MONGODB_PATH2, settings.MONGODB_PORT2)
         db = conn.rakuten
         usedb = eval("db.%s" % memkey)
         nets = usedb.find()
         count = nets.count()
-        out = (os.path.join(settings.TMP_DIR,'pyg.png'))
+        out = (os.path.join(settings.TMP_DIR, out))
         max = 0
         min = 999999
-        for c,i in enumerate(nets):
+        for c,i in enumerate(nets):        
             if c % 1000 == 0:
                 print c+1,"/",count, i
+                if c > maxnode:
+                    break
             cc = float(i['count'])
             A.add_node(i['word01'])
             A.add_node(i['word02'])
@@ -85,7 +93,7 @@ class Recom():
             if wei < 0:
                 wei = 0
             A.add_edge(i['word01'],i['word02'], weight=wei)
-        A.layout(prog='dot')
+        A.layout(prog=prog)
         A.draw(out)
         # P = pgv.AGraph(d)
         # P.layout(prog='dot')
