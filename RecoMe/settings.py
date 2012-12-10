@@ -21,6 +21,8 @@ MONGODB_PORT2 = 10001
 MEMCACHED_USE = False
 MEMCACHED_PATH = "127.0.0.1"
 MEMCACHED_PORT = 11211
+GRAPH = None
+GRAPH_KEY = ""
 try:
     from settings_local import *
 except:

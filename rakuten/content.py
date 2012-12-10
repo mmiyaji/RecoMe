@@ -33,7 +33,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
     recommend = False
     if name == "recommend":
         recommend = True
-        print content_id
+        print "content id",content_id
     # セッションに初回アクセスを保存
     session = request.session
     if 'date' not in session:
@@ -60,7 +60,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
 #            net = usedb.find({'rc':{'$exists':True} ,'genre_tree':genre, 'isimage':{'$ne':False}}).sort('rc', pymongo.DESCENDING).skip(start).limit(limit)
             if name == "recommend" and content_id and request.user.is_authenticated():
                 recommend = True
-                recom = Recom()
+                recom = Recom(memkey="nobel_word_network_limit100")
                 ids = get_individuals(request, user, content_id, span, pspan, recom)
                 contents = get_contens(ids, usedb, genre)
                 count = 0
@@ -159,8 +159,8 @@ def genre(request, genre_id = None):
     if settings.MONGODB_USE:
         start = 0
         genre_name = ""
-        MONGODB_PATH = "127.0.0.1"
-        # MONGODB_PATH = settings.MONGODB_PATH
+        # MONGODB_PATH = "127.0.0.1"
+        MONGODB_PATH = settings.MONGODB_PATH
         conn = pymongo.Connection(MONGODB_PATH, settings.MONGODB_PORT)
         db = conn.rakuten
         usedb = db.ichiba_genre
@@ -262,10 +262,29 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                     para = paras[p]
                     length = 0
                     try:
-                        lengthj,pathj = recom.get_path(para.word)
-                        path = pathj[w]
-                        length = lengthj[w]
+                        length,path = recom.get_path(para.word, w)
+                        # path = pathj[w]
+                        # length = lengthj[w]
+                        if len(path) == 2:
+                            print 'connencted 1length, then remove edge.',
+                            recom.delete_path(para.word, w)
+                            length,path = recom.get_path(para.word, w)
+                            recom.repair_edge()
                     except:
+                        print 'not connencted',
+                        print para.word, 'has',
+                        if recom.is_node(para.word):
+                            print len(recom.get_neighbors(para.word)),
+                        else:
+                            print 'no',
+                        print 'edges, ',
+                        print w, 'has',
+                        if recom.is_node(w):
+                            print len(recom.get_neighbors(w)),
+                        else:
+                            print 'no',
+                        print 'edges.',
+                        # print para.word,len(recom.get_path(para.word)),w,len(recom.get_path(w)),
                         path = [para.word, w]
                     hop = len(path)
                     sp = ts[1]["tfidf"]
@@ -282,10 +301,10 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                     path_value.append(ep)
                     rl = rouletteChoice(path_value)
                     if settings.DEBUG:
-                        print "path",path, path_value
+                        print "path", #,path, "value", path_value
                         for w1,w2 in zip(path, path_value):
-                            print w1,w2,",",
-                        print rl
+                            print w1,w2,"->",
+                        print "selected", rl,path[rl], path_value[rl]
                     para.word = path[rl]
                     para.score = path_value[rl]
                 else:
@@ -379,6 +398,7 @@ def echoes(request, inds, contents):
             "contents":contents,
             }
         f.write(serializers.serialize('json', tmp))
+        print tmp
         f.close()
     # except:
     #     pass

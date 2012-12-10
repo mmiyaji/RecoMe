@@ -18,12 +18,18 @@ class Recom():
         print memkey,cache.get(memkey)
         if memkey in cache:
             g,self.G = cache.get(memkey)
+        elif settings.GRAPH and settings.GRAPH_KEY == memkey:
+            self.G = settings.GRAPH
         else:
             try:
-                self.G=pickle.load(open(os.path.join(settings.TMP_DIR,'nx.dump')))
+                self.G=pickle.load(open(os.path.join(settings.TMP_DIR,'nx'+memkey+'.dump')))
             except:
                 g,self.G = self.recalc_network(memkey)
-                pickle.dump(self.G,open(os.path.join(settings.TMP_DIR,'nx.dump'),'w'))
+                pickle.dump(self.G,open(os.path.join(settings.TMP_DIR,'nx'+memkey+'.dump'),'w'))
+            if not settings.GRAPH:
+                print 'cache GRAPH', memkey
+                settings.GRAPH_KEY = memkey
+                settings.GRAPH = self.G
 #        for c,i in enumerate(self.G.nodes()):
 #            self.get_path(i)
 #            print c,i
@@ -33,24 +39,56 @@ class Recom():
         - `self`:
         """
         return self.G
+    def is_node(self, w):
+        if w in self.G.node:
+            return True
+        else:
+            return False
     def get_path(self, w1, w2 = ""):
-        p = "netpath_%s" % w1
+        p = "netpath_%s_%s" % (w1, w2)
         if p in cache:
             return cache.get(p)
         else:
-            length,path=nx.single_source_dijkstra(self.G, w1)
-            cache.set(p, [length,path], 300000)
-        if w2:
-            return length[w2],path[w2]
-        else:
-            return length,path
+            if self.is_node(w1) and self.is_node(w2):
+                length,path=nx.single_source_dijkstra(self.G, w1)
+                if w2 in path:
+                    cache.set(p, [length[w2],path[w2]], 300000)
+                    return length[w2],path[w2]
+                else:
+                    cache.set(p, [0,[w1,w2]], 300000)
+                    return 0,[w1,w2]
+            else:
+                cache.set(p, [0,[w1,w2]], 300000)
+                return 0,[w1,w2]
+        # if w2:
+        #     return length[w2],path[w2]
+        # else:
+        #     return length,path
+    def get_neighbors(self, w):
+        return self.G.neighbors(w)
+    def delete_path(self, w1, w2):
+        """
+        Arguments:
+        - `self`:
+        - `w1`:
+        - `w2`:
+        """
+        value = self.G.get_edge_data(w1,w2)['weight']
+        self.deleted_path = [w1, w2, value]
+        self.G.remove_edge(w1, w2)
+    def repair_path(self):
+        d = self.deleted_path
+        self.G.add_edge(d[0],d[1],weight=d[2])
+
     def recalc_network(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000):
+        print 'recalc network',memkey
         G=nx.Graph()
         conn = pymongo.Connection(settings.MONGODB_PATH2, settings.MONGODB_PORT2)
         db = conn.rakuten
         usedb = eval("db.%s" % memkey)
         nets = usedb.find()
         count = nets.count()
+        print 'count',count
         max = 0
         min = 999999
         for c,i in enumerate(nets):
@@ -81,7 +119,7 @@ class Recom():
         out = (os.path.join(settings.TMP_DIR, out))
         max = 0
         min = 999999
-        for c,i in enumerate(nets):        
+        for c,i in enumerate(nets):
             if c % 1000 == 0:
                 print c+1,"/",count, i
                 if c > maxnode:
