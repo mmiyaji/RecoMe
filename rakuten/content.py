@@ -261,17 +261,26 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                 if len(paras) > p:
                     para = paras[p]
                     length = 0
-                    try:
-                        length,path = recom.get_path(para.word, w)
+                    # try:
+                    if True:
+                        if para.word == w:
+                            length = 0
+                            path = [w]
+                            print 'same word',
+                        else:
+                            length,path = recom.get_path(para.word, w)
                         # path = pathj[w]
                         # length = lengthj[w]
-                        if len(path) == 2:
-                            print 'connencted 1length, then remove edge.',
-                            recom.delete_path(para.word, w)
+                        # if len(path) == 2:
+                        if length != 0 and len(path):
+                            print 'connected 1 length, then remove edge.',
+                            deleted = recom.delete_path(para.word, w)
                             length,path = recom.get_path(para.word, w)
-                            recom.repair_edge()
-                    except:
-                        print 'not connencted',
+                            if deleted:
+                                recom.repair_path()
+                    # except:
+                    else:
+                        print 'not connected',
                         print para.word, 'has',
                         if recom.is_node(para.word):
                             print len(recom.get_neighbors(para.word)),

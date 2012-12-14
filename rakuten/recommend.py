@@ -46,9 +46,10 @@ class Recom():
             return False
     def get_path(self, w1, w2 = ""):
         p = "netpath_%s_%s" % (w1, w2)
-        if p in cache:
-            return cache.get(p)
-        else:
+        # if p in cache:
+        #     return cache.get(p)
+        # else:
+        if True:
             if self.is_node(w1) and self.is_node(w2):
                 length,path=nx.single_source_dijkstra(self.G, w1)
                 if w2 in path:
@@ -73,9 +74,18 @@ class Recom():
         - `w1`:
         - `w2`:
         """
-        value = self.G.get_edge_data(w1,w2)['weight']
-        self.deleted_path = [w1, w2, value]
-        self.G.remove_edge(w1, w2)
+        print 'delete edge ',w1,w2,
+        # if self.is_node(w1) and self.is_node(w2):
+        if True:
+            if self.G.get_edge_data(w1,w2):
+                value = self.G.get_edge_data(w1,w2)['weight']
+                self.deleted_path = [w1, w2, value]
+                self.G.remove_edge(w1, w2)
+                return True
+            else:
+                return False
+        else:
+            return False
     def repair_path(self):
         d = self.deleted_path
         self.G.add_edge(d[0],d[1],weight=d[2])

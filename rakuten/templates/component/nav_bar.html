@@ -13,7 +13,7 @@
             <ul class="nav">
               <li {% if not target %}class="active"{% else %}{%ifequal target "home"%}class="active"{%endifequal%}{% endif %}><a href="/">トップページ</a></li>
               <li {%ifequal target "content"%}class="active"{%endifequal%}><a href="/content/">コンテンツリスト</a></li>
-              <li {%ifequal target "recommend"%}class="active"{%endifequal%}><a href="/recommend/">レコメンド</a></li>
+              <li {%ifequal target "recommend"%}class="active"{%endifequal%}><a href="/recommend/">レコメンド</a></li>              <li {%ifequal target "history"%}class="active"{%endifequal%}><a href="/history/">履歴</a></li>
               <li {%ifequal target "help"%}class="active"{%endifequal%}><a href="#">ヘルプ</a></li>
               <li {%ifequal target "login"%}class="active"{%endifequal%}>{% if user.is_anonymous %}<a href="/login/">ログイン</a>{% else %}<a href="/logout/">ログアウト【{{user}}】</a>{% endif %}</li>
             </ul>
