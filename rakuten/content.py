@@ -233,18 +233,23 @@ def get_individuals(request, user, content_id, span, pspan, recom):
     if c:
         tfidfs = c['tfidfs']
         user = request.user
+        inds = None
+        try:
+            now_history = History.get_by_user(user)[0]
+        except:
+            now_history = None
         history = History()
         history.user = user
         history.content_id = content_id
         history.save()
-
-        inds = Individual.get_by_user(user)
+        if now_history:
+            inds = now_history.individual.all()
         t = sorted(tfidfs.items(), key=lambda x: x[1]["tfidf"], reverse=True)
         ids = []
         for i in range(0,span):
             print "######",i
             try:
-                ind = inds[i]
+                ind = inds[i].clone()
             except:
                 ind = Individual()
                 ind.user = user
@@ -252,6 +257,8 @@ def get_individuals(request, user, content_id, span, pspan, recom):
             ind.save()
             ppp = []
             for p in range(0,pspan):
+                path_str = ""
+                deleted = False
                 paras = ind.parameter.all()
                 if len(t) > p:
                     ts = t[p]
@@ -309,11 +316,10 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                             path_value.append(sp+(pp*step))
                     path_value.append(ep)
                     rl = rouletteChoice(path_value)
-                    if settings.DEBUG:
-                        print "path", #,path, "value", path_value
-                        for w1,w2 in zip(path, path_value):
-                            print w1,w2,"->",
-                        print "selected", rl,path[rl], path_value[rl]
+                    for w1,w2 in zip(path, path_value):
+                        print w1,w2,"->",
+                        path_str += "%s(%s)," % (w1,w2)
+                    print "selected", rl,path[rl], path_value[rl]
                     para.word = path[rl]
                     para.score = path_value[rl]
                 else:
@@ -321,6 +327,8 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                     para.rank = p
                     para.word = w
                     para.score = ts[1]["tfidf"]
+                para.path = path_str
+                para.isdeleted_path = deleted
                 ppp.append(para.score)
                 para.save()
                 ind.parameter.add(para)
@@ -332,6 +340,8 @@ def get_individuals(request, user, content_id, span, pspan, recom):
             for pp1,p2 in zip(ind.parameter.all(),np):
                 pp1.score = p2
                 pp1.save()
+        history.individual = ids
+        history.save()
         return ids
 def get_contens(ids, usedb, genre, estimate=True):
     contents = []
