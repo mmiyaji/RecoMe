@@ -1,0 +1,60 @@
+{% extends "base/base.html" %}
+{% block main %}
+<!-- Masthead
+     ================================================== -->
+<!-- <header class="jumbotron subhead" id="overview"> -->
+  <!-- <h2 id="title">登録済みファイル</h2> -->
+<!-- Photo view
+     ================================================== -->
+<div>
+  <h1>【{{user.username}}】履歴 (last login: {{user.last_login}})</h1>
+  {% if genre_name %}<h2>{{genre_name}}
+    <!-- <small>{{count}} / {{session.session_key}} {{session.date}}</small> -->
+  </h2>{% endif %}
+  <ul id="content_thumb" class="thumbnails" data-toggle="modal-gallery" data-target="#modal-gallery">
+    {% for photo in contents %}
+    <li class="span3">
+      <div class="thumbnail img_popover" rel="popover" title="{{photo.name}}" data-content="<h5>商品説明</h5><ul><li>{{photo.description}}</li><li><small>{% for w in photo.words %}{{w}},{% endfor %}</small></li></ul>">
+        <a href="/{%ifequal target 'recommend'%}recommend{% else %}content{% endifequal %}/{{ photo.id }}/" class="thumbnail">
+          <img src="http://thumbnail.image.rakuten.co.jp/{{ photo.image_url }}" alt="view in new tab '{{photo.title}}'" width="100%">
+        </a>
+        {% ifnotequal photo.name "" %}
+        <div class="caption">
+          <h4>{{ photo.name }}</h4>
+          <!-- {% if photo.description %} -->
+          <!-- <hr /> -->
+          <!-- <p>{{ photo.description }} <small>{{ photo.ext_description }}</small></p> -->
+          <!-- <small>{{ photo.review_average }} [{{ photo.review_count }}]</small> -->
+          <!-- {% endif %} -->
+        </div>
+        {% endifnotequal %}
+        <!-- <small> -->
+        <!-- {% for t in photo.tfidfs %} -->
+        <!-- {{t}},{% endfor %} -->
+        <!-- </small> -->
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <hr class="soften">
+  <!-- <div class="btn-toolbar"> -->
+  <!--   <button class="btn btn-large" type="button"> -->
+  <!--     <i class="icon-arrow-left"></i> -->
+  <!--     Prev -->
+  <!--   </button> -->
+  <!--   <button class="btn btn-large btn-primary" type="button"> -->
+  <!--     Next -->
+  <!--     <i class="icon-arrow-right icon-white"></i> -->
+  <!--   </button> -->
+  <!-- </div> -->
+  <ul class="pager">
+    <li class="previous">
+      <a href="#">&larr; Prev</a>
+    </li>
+    <li class="next">
+      <a href="#">Next &rarr;</a>
+    </li>
+  </ul>
+</div>
+{% include "component/image_modal.html" %}
+{% endblock main %}
