@@ -7,6 +7,7 @@ Created by mmiyaji on 2012-12-14.
 Copyright (c) 2012  ruhenheim.org. All rights reserved.
 """
 from views import *
+from rakuten.models import *
 
 def home(request):
     """
@@ -22,17 +23,18 @@ def home(request):
 def user(request, user_name = ""):
     temp_values = Context()
     user = None
-    # get user
-    # try:
-    if user_name:
-        user = User.objects.get(username = user_name)
-    else:
-        user = request.user
-    # except User.DoesNotExist:
-    #     pass
+    try:
+        if user_name:
+            user = User.objects.get(username = user_name)
+        else:
+            user = request.user
+    except User.DoesNotExist:
+        pass
+    histories = History.get_by_user(user)
     temp_values = {
         "target":"history",
-        "user":user
+        "user":user,
+        "histories":histories,
         }
     return render_to_response('history/user.html',temp_values,
                               context_instance=RequestContext(request))

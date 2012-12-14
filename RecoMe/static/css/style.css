@@ -38,6 +38,9 @@ table#author_table tbody tr:hover *{
     color:navy;
     text-decoration: underline;
 }
+.table tbody tr td.error{
+    background-color: #f2dede;
+}
 /* .nav-tabs .dropdown-toggle:hover .caret, */
 /* .nav-pills .dropdown-toggle:hover .caret { */
 /*   border-top-color: #005580; */

@@ -74,7 +74,7 @@ class Recom():
         - `w1`:
         - `w2`:
         """
-        print 'delete edge ',w1,w2,
+        # print 'delete edge ',w1,w2,
         # if self.is_node(w1) and self.is_node(w2):
         if True:
             if self.G.get_edge_data(w1,w2):

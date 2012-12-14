@@ -8,11 +8,7 @@ Copyright (c) 2012  ruhenheim.org. All rights reserved.
 """
 from views import *
 from recommend import *
-import re, random
-from django.contrib.sessions.backends.db import SessionStore
 from rakuten.models import *
-import simplejson
-from django.core import serializers
 if settings.MONGODB_USE:
     import pymongo
 def home(request, genre_id = None, content_id = None, name = 'content'):
@@ -33,7 +29,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
     recommend = False
     if name == "recommend":
         recommend = True
-        print "content id",content_id
+        # print "content id",content_id
     # セッションに初回アクセスを保存
     session = request.session
     if 'date' not in session:
@@ -67,7 +63,7 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
                 genre_name = db.ichiba_genre.find({'id':genre})[0]["name"]
                 # echoes(request, ids, contents)
             else:
-                print content_id
+                # print content_id
                 if content_id:
                     ids = []
                     c = get_by_id_from_mongo(content_id)
@@ -256,10 +252,11 @@ def get_individuals(request, user, content_id, span, pspan, recom):
             ind.recent_history = history
             ind.save()
             ppp = []
+            paras = ind.sorted_param()
+            sorted(tfidfs.items(), key=lambda x: x[1]["tfidf"], reverse=True)
             for p in range(0,pspan):
                 path_str = ""
                 deleted = False
-                paras = ind.parameter.all()
                 if len(t) > p:
                     ts = t[p]
                     w = ts[0]
@@ -273,34 +270,30 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                         if para.word == w:
                             length = 0
                             path = [w]
-                            print 'same word',
+                            # print 'same word',
                         else:
                             length,path = recom.get_path(para.word, w)
-                        # path = pathj[w]
-                        # length = lengthj[w]
-                        # if len(path) == 2:
-                        if length != 0 and len(path):
-                            print 'connected 1 length, then remove edge.',
+                        if length != 0 and len(path) == 2:
                             deleted = recom.delete_path(para.word, w)
                             length,path = recom.get_path(para.word, w)
                             if deleted:
+                                # print 'connected 1 length, then remove edge.',
                                 recom.repair_path()
                     # except:
                     else:
-                        print 'not connected',
-                        print para.word, 'has',
-                        if recom.is_node(para.word):
-                            print len(recom.get_neighbors(para.word)),
-                        else:
-                            print 'no',
-                        print 'edges, ',
-                        print w, 'has',
-                        if recom.is_node(w):
-                            print len(recom.get_neighbors(w)),
-                        else:
-                            print 'no',
-                        print 'edges.',
-                        # print para.word,len(recom.get_path(para.word)),w,len(recom.get_path(w)),
+                        # print 'not connected',
+                        # print para.word, 'has',
+                        # if recom.is_node(para.word):
+                        #     print len(recom.get_neighbors(para.word)),
+                        # else:
+                        #     print 'no',
+                        # print 'edges, ',
+                        # print w, 'has',
+                        # if recom.is_node(w):
+                        #     print len(recom.get_neighbors(w)),
+                        # else:
+                        #     print 'no',
+                        # print 'edges.',
                         path = [para.word, w]
                     hop = len(path)
                     sp = ts[1]["tfidf"]
@@ -317,9 +310,9 @@ def get_individuals(request, user, content_id, span, pspan, recom):
                     path_value.append(ep)
                     rl = rouletteChoice(path_value)
                     for w1,w2 in zip(path, path_value):
-                        print w1,w2,"->",
+                        # print w1,w2,"->",
                         path_str += "%s(%s)," % (w1,w2)
-                    print "selected", rl,path[rl], path_value[rl]
+                    # print "selected", rl,path[rl], path_value[rl]
                     para.word = path[rl]
                     para.score = path_value[rl]
                 else:
@@ -335,8 +328,8 @@ def get_individuals(request, user, content_id, span, pspan, recom):
             ind.save()
             ids.append(ind)
             np = norm(ppp)
-            if settings.DEBUG:
-                print np, ppp
+            # if settings.DEBUG:
+            #     print np, ppp
             for pp1,p2 in zip(ind.parameter.all(),np):
                 pp1.score = p2
                 pp1.save()
@@ -353,17 +346,17 @@ def get_contens(ids, usedb, genre, estimate=True):
             iipara = ii.parameter.all()
             iiw = [iipara[0].word]
         else:
-            print ii
+            # print ii
             iipara = ii
             iiw = [iipara[0]["word"]]
         # for ip in iipara:
         #     iiw.append(ip.word)
         for il in range(0,len(iipara)-1):
-            if settings.DEBUG:
-                print 'search by ',
-                for q in iiw:
-                    print q,
-                print
+            # if settings.DEBUG:
+            #     print 'search by ',
+            #     for q in iiw:
+            #         print q,
+            #     print
             iiii = '_'.join(iiw)
             iikey = genre+"_"+iiii
             if iikey in cache:
@@ -375,13 +368,13 @@ def get_contens(ids, usedb, genre, estimate=True):
                                  })
                 try:
                     cache.set(iikey, c2, 0)
-                    if settings.DEBUG:
-                        print 'set',iikey
+                    # if settings.DEBUG:
+                    #     print 'set',iikey
                 except:
                     pass
-            print '## ', c2.count(),iiw
+            # print '## ', c2.count(),iiw
             if c2.count() > 0:
-                print iiw
+                # print iiw
                 for c in c2:
                     if c not in contents:
                         is_find = True
@@ -417,7 +410,7 @@ def echoes(request, inds, contents):
             "contents":contents,
             }
         f.write(serializers.serialize('json', tmp))
-        print tmp
+        # print tmp
         f.close()
     # except:
     #     pass

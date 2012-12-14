@@ -8,35 +8,51 @@
      ================================================== -->
 <div>
   <h1>【{{user.username}}】履歴 (last login: {{user.last_login}})</h1>
-  {% if genre_name %}<h2>{{genre_name}}
-    <!-- <small>{{count}} / {{session.session_key}} {{session.date}}</small> -->
-  </h2>{% endif %}
-  <ul id="content_thumb" class="thumbnails" data-toggle="modal-gallery" data-target="#modal-gallery">
-    {% for photo in contents %}
-    <li class="span3">
-      <div class="thumbnail img_popover" rel="popover" title="{{photo.name}}" data-content="<h5>商品説明</h5><ul><li>{{photo.description}}</li><li><small>{% for w in photo.words %}{{w}},{% endfor %}</small></li></ul>">
-        <a href="/{%ifequal target 'recommend'%}recommend{% else %}content{% endifequal %}/{{ photo.id }}/" class="thumbnail">
-          <img src="http://thumbnail.image.rakuten.co.jp/{{ photo.image_url }}" alt="view in new tab '{{photo.title}}'" width="100%">
-        </a>
+  <hr class="soften">
+  {% for history in histories %}
+  <h2>{{forloop.counter}}) {{history.created_at}}</h2>
+  <div class="row">
+    <h3>感性パラメータ</h3>
+    <table id="author_table" class="table table-bordered table-striped table-select">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th colspan="3">パラメータ(ソート済み)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inds in history.individual.all %}
+        <tr>
+          <td>{{forloop.counter}}</td>
+          {% for para in inds.sorted_param %}
+          <td class="img_popover {% if para.isdeleted_path %}error{% endif %}" rel="popover" title="rank {{para.rank}}: score {{para.score}}" data-content="<h5>交叉パス</h5><ul><li>{{para.get_path_as_html}}</li><li>パスの長さ：{{para.path_length}}</li><li>パス削除の有無：{{para.isdeleted_path}}</li>"><small>{{ para.word }}({{para.hscore}})</small></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <h3>直近で選択したコンテンツ</h3>
+    {% with history.get_content as photo %}
+    <div class="span3">
+      <div class="thumbnail">
+        <img src="http://thumbnail.image.rakuten.co.jp/{{ photo.image_url }}" alt="view in new tab '{{photo.title}}'" width="100%">
         {% ifnotequal photo.name "" %}
         <div class="caption">
           <h4>{{ photo.name }}</h4>
-          <!-- {% if photo.description %} -->
-          <!-- <hr /> -->
-          <!-- <p>{{ photo.description }} <small>{{ photo.ext_description }}</small></p> -->
-          <!-- <small>{{ photo.review_average }} [{{ photo.review_count }}]</small> -->
-          <!-- {% endif %} -->
         </div>
         {% endifnotequal %}
-        <!-- <small> -->
-        <!-- {% for t in photo.tfidfs %} -->
-        <!-- {{t}},{% endfor %} -->
-        <!-- </small> -->
       </div>
-    </li>
-    {% endfor %}
-  </ul>
-  <hr class="soften">
+    </div>
+    <div class="span9">
+      <h4>TF/IDF</h4>
+      <p>{% for k,w in photo.tfidfs.items %}{{k}}:{{w.tfidf}}, {% endfor %}</p>
+    </div>
+    {% endwith %}
+  </div>
+  <hr class="soften clearfix">
+  {% endfor %}
   <!-- <div class="btn-toolbar"> -->
   <!--   <button class="btn btn-large" type="button"> -->
   <!--     <i class="icon-arrow-left"></i> -->

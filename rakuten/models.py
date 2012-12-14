@@ -12,6 +12,8 @@ from django.db import models
 from django.db.models import Q
 from django.core.cache import cache
 from django.contrib.auth import models as auth_models
+if settings.MONGODB_USE:
+    import pymongo
 
 class Parameter(models.Model):
     word = models.CharField(max_length=255, blank=True, null=True, db_index=True)
@@ -20,6 +22,7 @@ class Parameter(models.Model):
     path = models.TextField(default="", blank=True, null=True) # word01(0.212),word02(0.23),..
     updated_at = models.DateTimeField(auto_now = True, db_index=True)
     created_at = models.DateTimeField(auto_now_add = True, db_index=True)
+    isdeleted_path = models.BooleanField(default=False, db_index=True)
     isvalid = models.BooleanField(default=True, db_index=True)
     def clone(self):
         p = Parameter()
@@ -29,6 +32,12 @@ class Parameter(models.Model):
         p.path = self.path
         p.save()
         return p
+    def hscore(self):
+        return str(self.score)[:4]
+    def get_path_as_html(self):
+        return self.path.replace(",",",<br />")
+    def path_length(self):
+        return len(self.path.split(","))-1
     def __unicode__(self):
         return "%s(%s) %s // %s" % (self.word,str(self.score),str(self.rank),self.path)
 class Individual(models.Model):
@@ -37,6 +46,8 @@ class Individual(models.Model):
     created_at = models.DateTimeField(auto_now_add = True, db_index=True)
     isvalid = models.BooleanField(default=True, db_index=True)
     # recent_history = models.ForeignKey(History, db_index=True)
+    def sorted_param(self):
+        return sorted(self.parameter.all(), key=lambda x: x.score, reverse=True)
     def clone(self):
         i = Individual()
         i.save()
@@ -56,7 +67,11 @@ class History(models.Model):
     updated_at = models.DateTimeField(auto_now = True, db_index=True)
     created_at = models.DateTimeField(auto_now_add = True, db_index=True)
     isvalid = models.BooleanField(default=True, db_index=True)
-
+    def get_content(self):
+        conn = pymongo.Connection(settings.MONGODB_PATH, settings.MONGODB_PORT)
+        db = conn.rakuten
+        usedb = db.booktree
+        return usedb.find_one({'id':self.content_id})
     @staticmethod
     def get_by_user(user):
         return History.objects.order_by('-created_at').filter(isvalid=True).filter(user=user)
