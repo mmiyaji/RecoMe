@@ -1,6 +1,11 @@
 Django==1.4.2
 ipython==0.13.1
 networkx==1.7
+numpy==1.6.2
+pygraphviz==1.1
 pymongo==2.3
 pysqlite==2.6.3
+python-memcached==1.48
+readline==6.2.4.1
+rpy2==2.3.0beta1
 simplejson==2.6.2

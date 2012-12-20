@@ -14,7 +14,7 @@ import pygraphviz as pgv
 class Recom():
     """
     """
-    def __init__(self, memkey="nobel_word_network_limit100"):
+    def __init__(self, memkey="nobel_word_network_limit100", netlim=0):
         print memkey,cache.get(memkey)
         if memkey in cache:
             g,self.G = cache.get(memkey)
@@ -24,7 +24,7 @@ class Recom():
             try:
                 self.G=pickle.load(open(os.path.join(settings.TMP_DIR,'nx'+memkey+'.dump')))
             except:
-                g,self.G = self.recalc_network(memkey)
+                g,self.G = self.recalc_network(memkey, netlim=netlim)
                 pickle.dump(self.G,open(os.path.join(settings.TMP_DIR,'nx'+memkey+'.dump'),'w'))
             if not settings.GRAPH:
                 print 'cache GRAPH', memkey
@@ -90,7 +90,7 @@ class Recom():
         d = self.deleted_path
         self.G.add_edge(d[0],d[1],weight=d[2])
 
-    def recalc_network(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000):
+    def recalc_network(self, memkey="nobel_word_network_limit100", wordmemkey="nobel_word", memtime=0, netlim=0, edge_max=277095.0, span = 20000):
         print 'recalc network',memkey
         G=nx.Graph()
         conn = pymongo.Connection(settings.MONGODB_PATH2, settings.MONGODB_PORT2)
@@ -101,17 +101,45 @@ class Recom():
         print 'count',count
         max = 0
         min = 999999
-        for c,i in enumerate(nets):
-            if c % 1000 == 0:
-                print c+1,"/",count, i
-            cc = float(i['count'])
-            G.add_node(i['word01'])
-            G.add_node(i['word02'])
-            wei = 1.0-cc/edge_max
-            if wei < 0:
-                wei = 0
-            G.add_edge(i['word01'],i['word02'], weight=wei)
-        cache.set(memkey, G, memtime)
+        if not netlim:
+            for c,i in enumerate(nets):
+                if c % 1000 == 0:
+                    print c+1,"/",count, i
+                cc = float(i['count'])
+                G.add_node(i['word01'])
+                G.add_node(i['word02'])
+                wei = 1.0-cc/edge_max
+                if wei < 0:
+                    wei = 0
+                G.add_edge(i['word01'],i['word02'], weight=wei)
+            cache.set(memkey, G, memtime)
+        else:
+            worddb = eval("db.%s" % wordmemkey)
+            words = worddb.find()
+            word_count = words.count()
+            for c,w in enumerate(words):
+                try:
+                    n1 = usedb.find({'word01':w["word"]}).sort('count', pymongo.DESCENDING)[0]
+                    n2 = usedb.find({'word02':w["word"]}).sort('count', pymongo.DESCENDING)[0]
+                    if c % 1000 == 0:
+                        print c+1,"/",count
+                    cc1 = float(n1['count'])
+                    G.add_node(n1['word01'])
+                    G.add_node(n1['word02'])
+                    wei = 1.0-cc1/edge_max
+                    if wei < 0:
+                        wei = 0
+                    G.add_edge(n1['word01'],n1['word02'], weight=wei)
+                    cc2 = float(n2['count'])
+                    G.add_node(n2['word01'])
+                    G.add_node(n2['word02'])
+                    wei = 1.0-cc2/edge_max
+                    if wei < 0:
+                        wei = 0
+                    G.add_edge(n2['word01'],n2['word02'], weight=wei)
+                except:
+                    print "error"
+            cache.set(memkey, G, memtime)
         return cache.get(memkey),G
     def draw(self, memkey="nobel_word_network_limit100", memtime=0, netlim=3, edge_max=277095.0, span = 20000, viewport='3000,2000,.1', out='pyg.png', prog='neato', maxnode=2000):
         dot = """
@@ -153,5 +181,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
+
 

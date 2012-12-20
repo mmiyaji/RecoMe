@@ -56,7 +56,8 @@ def home(request, genre_id = None, content_id = None, name = 'content'):
 #            net = usedb.find({'rc':{'$exists':True} ,'genre_tree':genre, 'isimage':{'$ne':False}}).sort('rc', pymongo.DESCENDING).skip(start).limit(limit)
             if name == "recommend" and content_id and request.user.is_authenticated():
                 recommend = True
-                recom = Recom(memkey="nobel_word_network_limit100")
+                # recom = Recom(memkey="nobel_word_network_limit100")
+                recom = Recom(memkey="nobel_word_network", netlim=2)
                 ids = get_individuals(request, user, content_id, span, pspan, recom)
                 contents = get_contens(ids, usedb, genre)
                 count = 0
